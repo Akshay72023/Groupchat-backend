@@ -25,6 +25,30 @@ exports.postSignup = async (req, res, next) => {
     }
 };
 
+function generateAccessToken(id,userName){
+    return jwt.sign({userId :id , username:userName}, process.env.TOKEN_SECRET);
+}
 
+exports.postLogin = async (req, res, next) => {
+    try {
+        const { email, password } = req.body;
+        const existingUser = await User.findOne({ where: { email: email } });
+        if (!existingUser) {
+            return res.status(404).json({ err: "User not found" });
+        }
+        bcrypt.compare(password, existingUser.password, (err, result) => {
+            if (err) {
+                throw err;
+            }
+            if (result) {
+                return res.status(200).json({success:true,message: 'Login successful' ,token: generateAccessToken(existingUser.id,existingUser.userName)});
+            } else {
+                return res.status(401).json({success:false, err: "Unauthorized: Invalid password" });
+            }
+        });
+    } catch (err) {
+        return res.status(500).json({ error: err.message });
+    }
+};
 
 

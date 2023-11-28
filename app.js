@@ -8,17 +8,28 @@ const path=require('path');
 dotenv.config();
 const app = express();
 app.use(bodyParser.json());
-app.use(cors());
+app.use(cors({
+    origin:"*",
+    credentials: true
+}));
 
 const signupRoutes = require('./routes/user');
+const passwordRoutes=require('./routes/forgotpassword');
 
 
 app.use('/user',signupRoutes);
+app.use('/password',passwordRoutes);
 
 
 app.use((req,res,next)=>{
     res.sendFile(path.join(__dirname,`views/${req.url}`))
 });
+
+const User= require('./models/user');
+const Forgotpassword=require('./models/forgotpassword');
+
+User.hasMany(Forgotpassword);
+Forgotpassword.belongsTo(User);
 
 sequelize
     .sync()
