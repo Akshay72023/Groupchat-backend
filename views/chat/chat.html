@@ -59,6 +59,17 @@
         #sendBtn:hover {
             background-color: #55716ec9; 
         }
+    .chatUl{
+        list-style-type: none;
+        width: 60vw;
+    }
+
+    .chatLi{
+        border-radius: 0.6em;
+        padding: 0.3em;
+        margin-top: 0.6em;
+        background-color: rgb(230, 230, 230);
+    }
     </style>
     <title>ChatApp</title>
 </head>
@@ -67,6 +78,11 @@
         <h1 class="heading">Group Chat App</h1>
     </header>
     <div class="prompt-div"></div>
+    <div class="chatDiv">
+        <ul class="chatUl">
+
+        </ul>
+    </div>
     <footer>
         <form class="msg-form" action="">
             <input type="text" class="msg-input" name="msg" id="msg-input">

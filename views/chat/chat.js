@@ -1,6 +1,7 @@
 const msgForm = document.querySelector('.msg-form');
 const msgInput = document.getElementById('msg-input');
-const promptDiv = document.querySelector('.prompt-div')
+const promptDiv = document.querySelector('.prompt-div');
+const chatUl = document.querySelector('.chatUl')
 
 msgForm.addEventListener('submit',sendMessage);
 
@@ -35,4 +36,38 @@ async function sendMessage (e){
         }
 
     }
+}
+
+window.addEventListener('DOMContentLoaded',loadMsg);
+
+async function loadMsg(e){
+    try{
+        let response = await axios.get('http://localhost:5000/chat/getMsg');
+        if(response.data.success){
+            // showing msg on display
+            response.data.msgArray.forEach((msgObj)=>{
+                // making an li
+                let li = makeLi(msgObj.username,msgObj.message,msgObj.createdAt);
+                // appending li to ul
+                chatUl.appendChild(li)
+            })
+        }
+        else{
+            //showing error message on screen
+            promptDiv.innerHTML = '<p class="failure">Something Went Wrong</p>'
+            setTimeout(()=>promptDiv.innerHTML = '',1000)
+        }
+    }
+    catch(err){
+        console.log(err);
+    }
+
+}
+
+
+function makeLi(name,msg){
+    let li = document.createElement('li');
+    li.className = 'chatLi'
+    li.innerText = `${name} - ${msg}`;
+    return li
 }
