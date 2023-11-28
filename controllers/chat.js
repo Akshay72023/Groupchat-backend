@@ -3,7 +3,6 @@ const Message = require('../models/message');
 const sequelize = require('../utils/database');
 
 exports.sendMsg = async(req,res,next)=>{
-    const t = await sequelize.transaction()
     try{
         const msg = req.body.msg;
         const user = req.user
@@ -13,19 +12,16 @@ exports.sendMsg = async(req,res,next)=>{
             userId : user.id,
             username : user.userName,
         })
-        await t.commit()
         res.json({msg : 'message Sent', success : true})
 
     }
     catch(err){
-        await t.rollback()
         console.log(err)
         res.json({msg : 'Something went Wrong', success : false})
     }
 };
 
 exports.getMsg = async(req,res,next)=>{
-    let t = sequelize.transaction()
     try{
         // getting all the messages from DB
         let msgArray = await Message.findAll({
