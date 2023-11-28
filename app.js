@@ -15,10 +15,12 @@ app.use(cors({
 
 const signupRoutes = require('./routes/user');
 const passwordRoutes=require('./routes/forgotpassword');
+const chatRoutes=require('./routes/chat');
 
 
 app.use('/user',signupRoutes);
 app.use('/password',passwordRoutes);
+app.use('/chat',chatRoutes);
 
 
 app.use((req,res,next)=>{
@@ -27,9 +29,12 @@ app.use((req,res,next)=>{
 
 const User= require('./models/user');
 const Forgotpassword=require('./models/forgotpassword');
+const Message = require('./models/message');
 
 User.hasMany(Forgotpassword);
 Forgotpassword.belongsTo(User);
+User.hasMany(Message);
+Message.belongsTo(User);
 
 sequelize
     .sync()
