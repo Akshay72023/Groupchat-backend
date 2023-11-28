@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+       body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            margin-bottom: 1em;
+            padding: 0;
+        }
+
+        .heading {
+            font-weight: bold;
+            text-align: center;
+            padding: 18px;
+            margin: 0;
+            background-color: #1ecb495e;
+            color: #181414; 
+        }
+
+        footer {
+            margin-top: 1em;
+            padding-top: 8px;
+            padding-bottom: 10px;
+            background-color: #1ecb495e;
+            position: fixed; 
+            bottom: 0;
+            width: 100%;
+        }
+
+        .msg-form {
+            margin: auto;
+            width: 60vw; 
+        }
+
+        .msg-input {
+            width: 70%; 
+            padding: 10px; 
+            border-radius: 8px;
+            border: 1px solid #ddd; 
+        }
+
+        #sendBtn {
+            padding: 10px; 
+            width: 25%; 
+            border: none;
+            background-color: #295550c9;
+            color: #fff; 
+            cursor: pointer;
+        }
+
+        #sendBtn:hover {
+            background-color: #55716ec9; 
+        }
+    </style>
+    <title>ChatApp</title>
+</head>
+<body class="body-class">
+    <header>
+        <h1 class="heading">Group Chat App</h1>
+    </header>
+
+    <footer>
+        <form class="msg-form" action="">
+            <input type="text" class="msg-input" name="msg" id="msg-input">
+            <input type="submit" value="Send" name="sendBtn" id="sendBtn">
+        </form>
+    </footer>
+</body>
+</html>
