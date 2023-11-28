@@ -1,6 +1,7 @@
 const User = require('../models/user');
 const Message = require('../models/message');
 const sequelize = require('../utils/database');
+const { Op } = require('sequelize');
 
 exports.sendMsg = async(req,res,next)=>{
     try{
@@ -21,15 +22,16 @@ exports.sendMsg = async(req,res,next)=>{
     }
 };
 
-exports.getMsg = async(req,res,next)=>{
+exports.getNewMsg = async(req,res,next)=>{
     try{
-        // getting all the messages from DB
-        let msgArray = await Message.findAll({
-            order : [
-                ['createdAt','ASC']
-            ]
+        let newMsgArray = await Message.findAll({
+            where : {
+                id : {
+                    [Op.gt] : +req.query.lastMsgId
+                }
+            }
         })
-        res.json({msgArray : msgArray, success : true})
+        res.json({newMsgArray : newMsgArray, success : true})
     }
     catch(err){
         console.log(err);

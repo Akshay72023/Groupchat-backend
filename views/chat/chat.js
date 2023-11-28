@@ -26,6 +26,7 @@ async function sendMessage(e) {
                 // Clearing input
                 msgInput.value = '';
                 // Reload messages after sending
+                chatUl.innerHTML = '';
                 loadMsg();
             } else {
                 promptDiv.innerHTML = '<p class="failure">Something Went Wrong</p>';
@@ -39,21 +40,29 @@ async function sendMessage(e) {
 
 window.addEventListener('DOMContentLoaded', loadMsg);
 
-async function loadMsg() {
-    try {
-        let response = await axios.get('http://localhost:5000/chat/getMsg');
-        if (response.data.success) {
-            // Clear existing messages before appending new ones
+async function loadMsg(){
+    try{
+        let oldMsgArray = JSON.parse(localStorage.getItem('oldMsgArray'));
+        let lastMsgId;
+        if(oldMsgArray === null){
+            oldMsgArray = [];
+            lastMsgId = 0;
+        }
+        else{
+            lastMsgId = oldMsgArray[oldMsgArray.length - 1].id;
+        }
+        let response = await axios.get(`http://localhost:5000/chat/getNewMsg?lastMsgId=${lastMsgId}`);
+        console.log(response);
+
+        if(response.data.success){
+            let msgArray = [...oldMsgArray,...response.data.newMsgArray]
+            storeInLocalStorage(msgArray);
             chatUl.innerHTML = '';
-            // Showing msg on display
-            response.data.msgArray.forEach((msgObj) => {
-                // Making an li
+            msgArray.forEach((msgObj)=>{
                 let li = makeLi(msgObj.username, msgObj.message, msgObj.createdAt);
-                // Appending li to ul
                 chatUl.appendChild(li);
             });
         } else {
-            // Showing error message on screen
             promptDiv.innerHTML = '<p class="failure">Something Went Wrong</p>';
             setTimeout(() => (promptDiv.innerHTML = ''), 1000);
         }
@@ -67,6 +76,17 @@ function makeLi(name, msg, createdAt) {
     li.className = 'chatLi';
     li.innerText = `${name} - ${msg} (${createdAt})`;
     return li;
+}
+
+function storeInLocalStorage(msgArray){
+    let slicedArray;
+    if(msgArray.length <10){
+        slicedArray = msgArray
+    }
+    else{
+        slicedArray = msgArray.slice(msgArray.length - 10)
+    }
+    localStorage.setItem('oldMsgArray',JSON.stringify(slicedArray))
 }
 
 // Reload messages every 5 seconds
