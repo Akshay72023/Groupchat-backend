@@ -16,11 +16,13 @@ app.use(cors({
 const signupRoutes = require('./routes/user');
 const passwordRoutes=require('./routes/forgotpassword');
 const chatRoutes=require('./routes/chat');
+const groupRoutes = require('./routes/group');
 
 
 app.use('/user',signupRoutes);
 app.use('/password',passwordRoutes);
 app.use('/chat',chatRoutes);
+app.use('/group',groupRoutes);
 
 
 app.use((req,res,next)=>{
@@ -30,14 +32,20 @@ app.use((req,res,next)=>{
 const User= require('./models/user');
 const Forgotpassword=require('./models/forgotpassword');
 const Message = require('./models/message');
+const Group = require('./models/group');
+const GroupUser = require('./models/groupuser');
 
 User.hasMany(Forgotpassword);
 Forgotpassword.belongsTo(User);
 User.hasMany(Message);
 Message.belongsTo(User);
+User.belongsToMany(Group,{through : GroupUser,foreignKey : "userId"});
+Group.belongsToMany(User,{through : GroupUser, foreignKey : 'groupId'});
+Group.hasMany(Message);
+Message.belongsTo(Group);
 
 sequelize
-    .sync()
+    .sync({alter:true})
     //.sync({force:true})
     .then(() => {
         app.listen(5000, () => {

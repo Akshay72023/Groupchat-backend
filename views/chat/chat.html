@@ -4,84 +4,53 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-       body {
-            font-family: sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-
-        header {
-            margin-bottom: 1em;
-            padding: 0;
-        }
-
-        .heading {
-            font-weight: bold;
-            text-align: center;
-            padding: 18px;
-            margin: 0;
-            background-color: #1ecb495e;
-            color: #181414; 
-        }
-
-        footer {
-            margin-top: 1em;
-            padding-top: 8px;
-            padding-bottom: 10px;
-            background-color: #1ecb495e;
-            position: fixed; 
-            bottom: 0;
-            width: 100%;
-        }
-
-        .msg-form {
-            margin: auto;
-            width: 60vw; 
-        }
-
-        .msg-input {
-            width: 70%; 
-            padding: 10px; 
-            border-radius: 8px;
-            border: 1px solid #ddd; 
-        }
-
-        #sendBtn {
-            padding: 10px; 
-            width: 25%; 
-            border: none;
-            background-color: #295550c9;
-            color: #fff; 
-            cursor: pointer;
-        }
-
-        #sendBtn:hover {
-            background-color: #55716ec9; 
-        }
-    .chatUl{
-        list-style-type: none;
-        width: 60vw;
-    }
-
-    .chatLi{
-        border-radius: 0.6em;
-        padding: 0.3em;
-        margin-top: 0.6em;
-        background-color: rgb(230, 230, 230);
-    }
-    </style>
+    <link rel="stylesheet" href="./chat.css">
     <title>ChatApp</title>
 </head>
 <body class="body-class">
     <header>
-        <h1 class="heading">Group Chat App</h1>
+        <nav class="nav">
+            <ul class="nav-ul">
+                <li>
+                    <button class="createGroupBtn">Create Group</button>
+                    <form id="createGroupForm" class="createGroupForm" style="display:none;" action="">
+                        <input type="text" class="createGroupInput" id="createGroupName" placeholder="Enter group name">
+                        <button type="submit">Create</button>
+                    </form>
+                </li>
+            </ul>
+            <h1 class="heading">Group Chat App</h1>
+        </nav>
     </header>
     <div class="prompt-div"></div>
-    <div class="chatDiv">
-        <ul class="chatUl">
+    <div class="flex">
+        <!-- a div where all the groups and create group option will be -->
+        <div class="groupDiv"> 
+            <ul class="groupUl">
+                <h4>Groups</h4>
+            </ul>
+        </div>
+        <!-- a div where all chats of group will be -->
+        <div class="chatDiv">
+            <div>
+                <nav class="grpInfoNav">
+                    <div class="groupInfo"></div>
+                    <ul class="grpInfoUl">
+                        <li>
+                            <button class="addMemberBtn">Add Member</button>
+                            <form id="addMemberForm" class="addMemberForm" style="display:none;" action="">
+                                <input type="text" class="addMemberInput" placeholder="Enter Email">
+                                <button type="submit">Add</button>
+                            </form>
+                        </li>
+                    </ul>
+                </nav>
 
-        </ul>
+            </div>
+            <ul class="chatUl">
+
+            </ul>
+        </div>
     </div>
     <footer>
         <form class="msg-form" action="">

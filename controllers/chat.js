@@ -6,12 +6,14 @@ const { Op } = require('sequelize');
 exports.sendMsg = async(req,res,next)=>{
     try{
         const msg = req.body.msg;
-        const user = req.user
+        const user = req.user;
+        const groupId = req.body.groupId
         // creating a new nessage
         await Message.create({
             message : msg,
             userId : user.id,
             username : user.userName,
+            groupId : groupId
         })
         res.json({msg : 'message Sent', success : true})
 
@@ -28,7 +30,8 @@ exports.getNewMsg = async(req,res,next)=>{
             where : {
                 id : {
                     [Op.gt] : +req.query.lastMsgId
-                }
+                },
+                groupId : req.query.groupId
             }
         })
         res.json({newMsgArray : newMsgArray, success : true})
