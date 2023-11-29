@@ -1,4 +1,7 @@
 const User = require('../models/user');
+const GroupUser = require('../models/groupuser');
+const sequelize = require('../utils/database');
+const { Op } = require('sequelize');
 const bcrypt = require('bcrypt');
 const jwt=require('jsonwebtoken');
 require("dotenv").config();
@@ -25,8 +28,8 @@ exports.postSignup = async (req, res, next) => {
     }
 };
 
-function generateAccessToken(id,userName){
-    return jwt.sign({userId :id , username:userName}, process.env.TOKEN_SECRET);
+function generateJWT (user){
+    return jwt.sign({userId : user.id},process.env.TOKEN_SECRET)
 }
 
 exports.postLogin = async (req, res, next) => {
@@ -41,7 +44,7 @@ exports.postLogin = async (req, res, next) => {
                 throw err;
             }
             if (result) {
-                return res.status(200).json({success:true,message: 'Login successful' ,token: generateAccessToken(existingUser.id,existingUser.userName)});
+                return res.status(200).json({success:true,message: 'Login successful' ,token : generateJWT(existingUser),username : existingUser.userName ,email : existingUser.email});
             } else {
                 return res.status(401).json({success:false, err: "Unauthorized: Invalid password" });
             }
@@ -49,6 +52,38 @@ exports.postLogin = async (req, res, next) => {
     } catch (err) {
         return res.status(500).json({ error: err.message });
     }
+};
+
+exports.checkIfAdmin = async(req,res,next)=>{
+    const t = await sequelize.transaction();
+    try{
+        let user = req.user;
+        let groupId = req.body.groupId;
+        // checking if user is admin of group
+            // first finding in GroupUser
+        let response = await GroupUser.findOne({
+            where : {
+                [Op.and] : [
+                    {userId : user.id},
+                    {groupId : groupId}
+                ]
+            },transaction : t
+        })
+        await t.commit()
+        // checking if admin or not
+        if(response.isAdmin){
+            res.json({success : true})
+        }
+        else{
+            res.json({success : false,msg : 'You are not Admin'})
+        }
+    }
+    catch(err){
+        console.log(err);
+        await t.rollback();
+        res.json({success : false, msg : "Something Went Wrong"})
+    }
+
 };
 
 

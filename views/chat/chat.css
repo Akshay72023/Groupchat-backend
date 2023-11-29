@@ -62,7 +62,11 @@ nav ul {
     margin: 0;
     background-color: #1ecb4900;
     color: #181414;
-    flex-grow: 1; /* Added to make it take available space */
+    flex-grow: 1; 
+}
+
+.userInfo{
+    display: block;
 }
 
 .flex {
@@ -104,7 +108,7 @@ nav ul {
     padding: 0 60px 0px 39px;
 }
 
-.addMemberBtn {
+.addMemberBtn, .showMemberBtn{
     padding: 6px 10px 6px 10px;
     border-radius: 8px;
     background-color: #295550c9;
@@ -169,6 +173,50 @@ footer {
 
 #sendBtn:hover {
     background-color: #55716ec9;
+}
+.memberList{
+    display: block;
+    position: absolute;
+    background-color: #d5d5cb;
+    padding: 1em;
+    border-radius: 10px 10px 20px 20px;
+    width: 17vw;
+}
+.memberList p {
+    margin: 0;
+}
+
+.memberListLi{
+    padding: 4px 0 4px 0px;
+}
+
+.adminBtnClass{
+    position: absolute;
+    right: 29%;
+    background-color: #9df47e;
+    border-radius: 10px;
+}
+.makeAdminBtnClass{
+    position: absolute;
+    right: 29%;
+    background-color: #f4dc7e;
+    border-radius: 10px;
+}
+.adminBtnClass:hover{
+    background-color: #70d74b;
+}
+.makeAdminBtnClass:hover{
+    background-color: #d3b951;
+}
+
+.removeBtnClass{
+    position: absolute;
+    right: 5px;
+    background-color: #f47e7e;
+    border-radius: 10px;
+}
+.removeBtnClass:hover{
+    background-color: #d64848;
 }
 
 .chatUl {

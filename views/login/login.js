@@ -13,6 +13,8 @@ loginBtn.addEventListener('click',
             console.log(response);
             if(response.status===200){
                 localStorage.setItem('token', response.data.token);
+                localStorage.setItem('username',response.data.username);
+                localStorage.setItem('email',response.data.email);
                 alert(response.data.message);
                 window.location.href = '../chat/chat.html'
 

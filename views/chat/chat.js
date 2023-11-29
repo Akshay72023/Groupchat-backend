@@ -8,7 +8,14 @@ const createGroupForm = document.querySelector('#createGroupForm');
 const createGrpNameInput = document.getElementById('createGroupName');
 const groupInfo = document.querySelector('.groupInfo');
 const addMemberBtn = document.querySelector('.addMemberBtn');
-const addMemberForm = document.getElementById('addMemberForm')
+const addMemberForm = document.getElementById('addMemberForm');
+const memberList = document.getElementById('memberList');
+const usernameLi = document.getElementById('usernameLi');
+const emailLi = document.getElementById('emailLi');
+const showMemberBtn= document.querySelector('.showMemberBtn');
+
+usernameLi.innerText = `User :: ${localStorage.getItem('username')}`
+emailLi.innerText = `Email :: ${localStorage.getItem('email')}`
 
 msgForm.addEventListener('submit', sendMessage);
 
@@ -54,7 +61,7 @@ async function loadMsg(){
         let oldMsgArray = JSON.parse(localStorage.getItem('oldMsgArray'));
         let lastMsgId;
         // checking if there is no old msg array in localstorage (can happen for newly signup or when a new group is created)
-        if(oldMsgArray === null || []){
+        if(oldMsgArray === null || oldMsgArray.length === 0){
             oldMsgArray = [];
             lastMsgId = 0;
         }
@@ -63,7 +70,9 @@ async function loadMsg(){
         }
          // first finding out group name with the help of group Id and showing it
          let result = await axios.get(`http://localhost:5000/group/findGroup?groupId=${groupId}`)
-         groupInfo.innerHTML = `<h4>${result.data.group.name}</h4>`
+         if(result.data.group){
+            groupInfo.innerHTML = `<h4>${result.data.group.name}</h4>`
+        };
  
          // now getting new messages from DB
          let response = await axios.get(`http://localhost:5000/chat/getNewMsg?lastMsgId=${lastMsgId}&groupId=${groupId}`);
@@ -117,9 +126,28 @@ createGroupForm.addEventListener('submit',async(e)=>{
 })
 
 //-----------------handling add member Btn-----------------------//
-addMemberBtn.addEventListener('click',(e)=>{
-    // toggling the visibility of form
-    addMemberForm.style.display = addMemberForm.style.display === 'none' ? 'block' : 'none';
+addMemberBtn.addEventListener('click',async(e)=>{
+    try{
+        // first we have to check if user is admin or not
+        let token = localStorage.getItem('token');
+        let groupId = localStorage.getItem('groupId');
+             // making a post call
+        let response = await axios.post('http://localhost:5000/user/checkIfAdmin',{
+            groupId : groupId
+        },{ headers:{ 'Authorization': token }})
+
+        if(response.data.success){
+            // toggling the visibility of form
+            addMemberForm.style.display = addMemberForm.style.display === 'none' ? 'block' : 'none';
+        }
+        else{
+            alert(response.data.msg)
+        }
+
+    }
+    catch(err){
+        console.log(err)
+    }
 })
 
 //----------------handling add member form------------------------//
@@ -129,29 +157,77 @@ async function addUserToGroup(e){
     e.preventDefault()
     try{
         const token = localStorage.getItem('token')
-        let email = document.querySelector('.addMemberInput')
-        // storing groupId and email in an obj
-        let obj = {groupId : localStorage.getItem('groupId'), email : email.value };
-        // making a post request
-        let result = await axios.post('http://localhost:5000/group/addUser',obj,{
-            headers:{ 'Authorization': token }
-        })
+        const groupId = localStorage.getItem('groupId')
 
-        if(result.data.success === false){
-            alert(result.data.msg)
+        // first we have to check if user(who is trying to add member) is admin or not
+        let response = await axios.post('http://localhost:5000/user/checkIfAdmin',{
+            groupId : groupId
+        },{ headers:{ 'Authorization': token }})
+
+        if(response.data.success){          // user is admin
+            let email = document.querySelector('.addMemberInput').value;
+            console.log(email);
+            // storing groupId and email in an obj
+            let obj = {groupId : groupId , email : email };
+            // making a post request
+            let result = await axios.post('http://localhost:5000/group/addUser',obj,{
+                headers:{ 'Authorization': token }
+            })
+
+            if(result.data.success === false){
+                alert(result.data.msg)
+            }
+            else{
+                alert('User added to Group')
+
+                // clearing input
+                email.value = ''
+            }
         }
         else{
-            alert('User added to Group')
-
-            // clearing input
-            email.value = ''
+            alert(response.data.msg)
         }
-
     }
     catch(err){
         console.log(err)
     }
 
+}
+
+//-----------------handling Show Members Btn---------------------//
+showMemberBtn.addEventListener('click',showMembers);
+
+async function showMembers(e){
+    try{
+        // first finding all the members of the group
+        let token = localStorage.getItem('token');
+        let groupId = localStorage.getItem('groupId');
+
+        let response = await axios.get(`http://localhost:5000/group/getAllMembers?groupId=${groupId}`,{headers:{ 'Authorization': token }})
+
+        // showing members
+            // but first clearing list
+        memberList.innerHTML = '';
+        response.data.userArray.forEach((member)=>{
+            // making an member li
+            let li = makeMemberLi(member);
+            // making and adding remove btn
+            let removeBtn = makeRemoveBtn();
+            li.appendChild(removeBtn)
+            //Adding makeAdmin or Admin 
+            let adminBtn = makeAdminOrIsAdminBtn(member);
+            li.appendChild(adminBtn)
+            // appending li to memberlist
+            memberList.appendChild(li)
+        })
+
+        // toggeling visibility of list
+        memberList.style.display = memberList.style.display === 'none' ? 'block' : 'none';
+
+    }
+    catch(err){
+        console.log(err)
+    }
 }
 
 //--------reloading groups when page reloads---------------------//
@@ -180,6 +256,75 @@ async function loadGroups(e){
     }
 }
 
+//-----------handling the member list options---------------//
+memberList.addEventListener('click',modifyMemberList);
+
+async function modifyMemberList(e){
+    try{
+        // getting group Id from localstorage
+        const groupId = localStorage.getItem('groupId');
+        const token = localStorage.getItem('token')
+
+        //---------------------- if remove btn is clicked---------------------//
+        if(e.target.className === 'removeBtnClass'){
+            // finding user id which we have to remove
+            let rmvUserId = e.target.parentElement.id;
+            // making a post request but 1st making an obj
+            let obj = {rmvUserId : rmvUserId, groupId : groupId}
+            let result = await axios.post('http://localhost:5000/group/removeMember',obj,{headers:{ 'Authorization': token }})
+
+            if(result.data.success){
+                showMemberBtn.click()
+                showMemberBtn.click()
+                alert('user removed')
+            }
+            else{
+                alert(result.data.msg)
+            }
+        }
+
+        //-------------------- if make admin button is clicked-----------------//
+        else if(e.target.className === 'makeAdminBtnClass'){
+            // finding user id which we have to make admin
+            let mkAdminUserId = e.target.parentElement.id;
+            // making a post request but 1st making an obj
+            let obj = {mkAdminUserId : mkAdminUserId, groupId : groupId}
+            let result = await axios.post('http://localhost:5000/group/makeAdmin',obj,{headers:{ 'Authorization': token }})
+
+            if(result.data.success){
+                showMemberBtn.click()
+                showMemberBtn.click()
+                alert('Selected User is now admin')
+            }
+            else{
+                alert(result.data.msg)
+            }
+        }
+
+        //---------------if Admin button is clicked--------------------------//
+        else if(e.target.className === 'adminBtnClass'){
+            // finding user id admin which we have to remove from admin
+            let rmAdminUserId = e.target.parentElement.id;
+            // making a post request but 1st making an obj
+            let obj = {rmAdminUserId : rmAdminUserId, groupId : groupId}
+            let result = await axios.post('http://localhost:5000/group/removeAdmin',obj,{headers:{ 'Authorization': token }})
+
+            if(result.data.success){
+                showMemberBtn.click()
+                showMemberBtn.click()
+                alert('Selected User is no longer an Admin')
+            }
+            else{
+                alert(result.data.msg)
+            }
+        }
+
+    }
+    catch(err){
+        console.log(err)
+    }
+}
+
 //------------selecting a group-------------------------//
 groupUl.addEventListener('click',selectGroup);
 
@@ -190,6 +335,10 @@ function selectGroup(e){
 
         // saving groupId in local storage
         localStorage.setItem('groupId',groupId);
+
+        // closing 'addmember' and 'member list' dropdowns
+        memberList.style.display = 'none';
+        addMemberForm.style.display = 'none';
 
         // clearing chatul and then loading msg
         chatUl.innerHTML = ''
@@ -224,5 +373,37 @@ function storeInLocalStorage(msgArray){
     localStorage.setItem(groupId,JSON.stringify(slicedArray));
 }
 
+function makeMemberLi(member){
+    let li = document.createElement('li');
+    li.id = member.userId
+    li.className = 'memberListLi'
+    li.innerHTML = `<span>${member.userName}</span>`
+    return li;
+}
+
+function makeRemoveBtn(){
+    let removeBtn = document.createElement('button');
+    removeBtn.className = 'removeBtnClass';
+    removeBtn.innerText = 'Remove'
+    return removeBtn
+}
+
+function makeAdminOrIsAdminBtn(member){
+    // checking if member is admin or not and adding btn accordingly
+    if(!member.isAdmin){
+        // making make Admin btn
+        let makeAdminBtn = document.createElement('button');
+        makeAdminBtn.className = 'makeAdminBtnClass';
+        makeAdminBtn.innerText = 'Make Admin';
+        return makeAdminBtn
+    }
+    else{
+        // making admin Btn
+        let adminBtn = document.createElement('button');
+        adminBtn.className = 'adminBtnClass';
+        adminBtn.innerText = 'Admin';
+        return adminBtn
+    }
+}
 // // Reload messages every 5 seconds
 // setInterval(loadMsg, 5000);

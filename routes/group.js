@@ -9,6 +9,14 @@ router.get('/getGroups',userAuthentication.authenticate,groupController.getGroup
 
 router.get('/findGroup',groupController.findGroup);
 
-router.post('/addUser',userAuthentication.authenticate,groupController.addUser)
+router.post('/addUser',groupController.addUser);
+
+router.get('/getAllMembers',userAuthentication.authenticate,groupController.getAllMembers);
+
+router.post('/removeMember',userAuthentication.authenticate,groupController.removeMember)
+
+router.post('/makeAdmin',userAuthentication.authenticate,groupController.makeAdmin);
+
+router.post('/removeAdmin',userAuthentication.authenticate,groupController.removeAdmin)
 
 module.exports = router

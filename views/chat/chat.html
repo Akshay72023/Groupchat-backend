@@ -20,6 +20,10 @@
                 </li>
             </ul>
             <h1 class="heading">Group Chat App</h1>
+            <ul class="userInfo">
+                <li id="usernameLi"></li>
+                <li id="emailLi"></li>
+            </ul>
         </nav>
     </header>
     <div class="prompt-div"></div>
@@ -42,6 +46,10 @@
                                 <input type="text" class="addMemberInput" placeholder="Enter Email">
                                 <button type="submit">Add</button>
                             </form>
+                        </li>
+                        <li>
+                            <button class="showMemberBtn">Show Members</button>
+                            <ul class="memberList" id="memberList" style="display:none;"></ul>
                         </li>
                     </ul>
                 </nav>

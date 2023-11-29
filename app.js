@@ -45,7 +45,7 @@ Group.hasMany(Message);
 Message.belongsTo(Group);
 
 sequelize
-    .sync({alter:true})
+    .sync()
     //.sync({force:true})
     .then(() => {
         app.listen(5000, () => {
