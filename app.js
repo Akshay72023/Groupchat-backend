@@ -4,6 +4,8 @@ const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
 const path=require('path');
 const cors = require('cors');
+const CronJob = require('cron').CronJob;
+const dataMigration = require('./services/datamigration');
 dotenv.config();
 const app = express();
 app.use(bodyParser.json());
@@ -60,6 +62,7 @@ const Message = require('./models/message');
 const Group = require('./models/group');
 const GroupUser = require('./models/groupuser');
 
+
 User.hasMany(Forgotpassword);
 Forgotpassword.belongsTo(User);
 User.hasMany(Message);
@@ -69,7 +72,14 @@ Group.belongsToMany(User,{through : GroupUser, foreignKey : 'groupId'});
 Group.hasMany(Message);
 Message.belongsTo(Group);
 
-
+// using cron to schedule  msg transfer (from message table to backupMsg table) every night at 1AM 
+let job = new CronJob(
+  '0 1 * * *',
+  dataMigration.migrateData,
+  null,
+  true,
+  'Asia/Kolkata'
+);
 
 async function startServer() {
     try {
