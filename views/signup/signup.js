@@ -32,7 +32,7 @@ signupBtn.addEventListener('click',
 });
 
 //--------handling socketIO----------------//
-const socket = io()
+const socket = io('http://localhost:8000');
 
 socket.on('connect',()=>{
     console.log("Connected to server with socket id :",socket.id);

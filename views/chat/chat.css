@@ -39,6 +39,11 @@ nav ul {
     display: none;
 }
 
+.chatDiv {
+    overflow-y: auto; /* Add a scrollbar if the content overflows vertically */
+    max-height: 70vh; /* Set a maximum height to limit the chat div size */
+}
+
 .createGroupInput {
     padding: 7px;
     border-radius: 14px;
@@ -229,4 +234,12 @@ footer {
     padding: 5px 8px 5px 8px;
     border-radius: 8px;
     width: fit-content;
+}
+
+#sendBtn {
+    margin-left: 10px; /* Adjust the value based on the space you want */
+}
+
+.sendImgForm{
+    padding: 0 15px 0px 0px
 }

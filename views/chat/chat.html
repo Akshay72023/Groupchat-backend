@@ -60,10 +60,18 @@
             </ul>
         </div>
     </div>
-    <footer>
+    <footer class="flex">
+        <div style="width: 30vw;"></div>
+        <form class="msg-form" action="">
+            <!-- form with send message button -->
         <form class="msg-form" action="">
             <input type="text" class="msg-input" name="msg" id="msg-input">
             <input type="submit" value="Send" name="sendBtn" id="sendBtn">
+        </form>
+        <!-- form with send Image button-->
+        <form id="sendImgForm" class="sendImgForm" action="">
+            <input type="file" id="fileInp" accept="image/*">
+            <button type="submit">send Image</button>
         </form>
     </footer>
 </body>

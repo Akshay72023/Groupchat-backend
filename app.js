@@ -15,22 +15,27 @@ const io = require('socket.io')(8000, {
     }
   });
 
-  io.on('connection',(socket)=>{
-    console.log('A new user has connected with socket id :',socket.id)
-
-    socket.on('sendMsg',(msgObj)=>{
-        console.log(msgObj.msg,'   ',msgObj.username,'  ',msgObj.time);
-        io.to(msgObj.groupId).emit('message',msgObj)
-    })
-
-    socket.on('joinRoom',(room)=>{
-        socket.join(room)
-    })
-
-    socket.on('leaveRoom',(room)=>{
-        socket.leave(room)
-    })
-})
+  io.on('connection', (socket) => {
+    console.log('A new user has connected with socket id:', socket.id);
+  
+    socket.on('sendMsg', (msgObj) => {
+      console.log(msgObj.msg, msgObj.username, msgObj.time);
+      io.to(msgObj.groupId).emit('message', msgObj);
+    });
+  
+    socket.on('sendFile', (fileObj) => {
+      io.to(fileObj.groupId).emit('fileMessage', fileObj);
+    });
+  
+    socket.on('joinRoom', (room) => {
+      socket.join(room);
+    });
+  
+    socket.on('leaveRoom', (room) => {
+      socket.leave(room);
+    });
+  });
+  
 
 
 const signupRoutes = require('./routes/user');
@@ -68,7 +73,9 @@ Message.belongsTo(Group);
 
 async function startServer() {
     try {
-      await sequelize.sync();
+      await sequelize.
+      //sync({force :true})
+      sync();
       app.listen(5000, () => {
         console.log('Listening on port 5000');
       });

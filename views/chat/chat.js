@@ -13,6 +13,8 @@ const memberList = document.getElementById('memberList');
 const usernameLi = document.getElementById('usernameLi');
 const emailLi = document.getElementById('emailLi');
 const showMemberBtn= document.querySelector('.showMemberBtn');
+const sendImgForm = document.getElementById('sendImgForm');
+const fileInput = document.getElementById('fileInp');
 
 usernameLi.innerText = `User :: ${localStorage.getItem('username')}`
 emailLi.innerText = `Email :: ${localStorage.getItem('email')}`
@@ -31,7 +33,7 @@ async function sendMessage(e) {
             let groupId = localStorage.getItem('groupId');
             
             //sending msg through socket
-            socket.emit('sendMsg',{msg : msgInput.value, username : localStorage.getItem('username'),time : new Date(),groupId : groupId});
+            socket.emit('sendMsg', { msg: msgInput.value, username: localStorage.getItem('username'), time: new Date(), groupId: groupId });
 
             // making an obj with msg
             let obj = {msg : msgInput.value , groupId : groupId};
@@ -360,6 +362,59 @@ function selectGroup(e){
     }
 }
 
+//-------------- handling send file option ------------------------//
+sendImgForm.addEventListener('submit',sendFile);
+
+async function sendFile (e){
+    e.preventDefault()
+    try{
+        const token = localStorage.getItem('token');
+        const groupId = localStorage.getItem('groupId')
+        let file = fileInput.files[0];
+
+        if(!file){
+            alert('No Image selected')
+        }
+        else{
+            // Using a built in JS object (FormData) to handle files
+            let formData = new FormData();
+            // appending file to form data
+            formData.append('file',file)
+            // making a post request to upload
+            let result = await axios.post('http://localhost:5000/chat/upload',formData,{headers:{ 'Authorization': token }})
+
+            if(result.data.success){
+                let fileurl = result.data.fileurl;
+                let filename = result.data.filename;
+
+                //sending msg through socket
+                // Change the socket.emit for sending files
+                socket.emit('sendFile', { msg: `<a href="${fileurl}">${filename}</a>`, username: localStorage.getItem('username'), time: new Date(), groupId: groupId });
+
+
+                // making an obj with msg
+                let obj = {msg : `<a href="${fileurl}">${filename}</a>` , groupId : groupId};
+                // posting this msg
+                let response = await axios.post('http://localhost:5000/chat/sendMsg',    obj,{ headers:{ 'Authorization': token }});
+                if(response.data.sucess){
+                    loadMsg();
+                }
+                fileInput.value = ''
+
+            }
+            else{
+                alert(result.data.msg)
+            }
+        }
+
+    }
+    catch(err){
+        console.log(err)
+        alert('Something Went wrong')
+    }
+}
+
+
 function makeLi(name, msg, createdAt) {
     let li = document.createElement('li');
     li.className = 'chatLi';
@@ -425,6 +480,12 @@ socket.on('message', (msgObj)=>{
     let li = makeLi(msgObj.username,msgObj.msg,msgObj.time);
     chatUl.appendChild(li)
 
-})
+});
+
+socket.on('fileMessage', (fileObj) => {
+    const { msg, username, time } = fileObj;
+    const li = makeLi(username, msg, time);
+    chatUl.appendChild(li);
+});
 // // Reload messages every 5 seconds
 // setInterval(loadMsg, 5000);
