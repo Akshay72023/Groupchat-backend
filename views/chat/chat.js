@@ -21,7 +21,7 @@ emailLi.innerText = `Email :: ${localStorage.getItem('email')}`
 
 msgForm.addEventListener('submit', sendMessage);
 
-const socket = io('http://localhost:8000')
+const socket = io('http://16.16.27.246:8000')
 
 async function sendMessage(e) {
     e.preventDefault();
@@ -38,7 +38,7 @@ async function sendMessage(e) {
             // making an obj with msg
             let obj = {msg : msgInput.value , groupId : groupId};
             // Posting this msg
-            let response = await axios.post('http://localhost:5000/chat/sendMsg', obj, {
+            let response = await axios.post('http://16.16.27.246:5000/chat/sendMsg', obj, {
                 headers: { 'Authorization': token }
             });
             console.log(response);
@@ -77,13 +77,13 @@ async function loadMsg(){
             lastMsgId = oldMsgArray[oldMsgArray.length - 1].id;
         }
          // first finding out group name with the help of group Id and showing it
-         let result = await axios.get(`http://localhost:5000/group/findGroup?groupId=${groupId}`)
+         let result = await axios.get(`http://16.16.27.246:5000/group/findGroup?groupId=${groupId}`)
          if(result.data.group){
             groupInfo.innerHTML = `<h4>${result.data.group.name}</h4>`
         };
  
          // now getting new messages from DB
-         let response = await axios.get(`http://localhost:5000/chat/getNewMsg?lastMsgId=${lastMsgId}&groupId=${groupId}`);
+         let response = await axios.get(`http://16.16.27.246:5000/chat/getNewMsg?lastMsgId=${lastMsgId}&groupId=${groupId}`);
         if(response.data.success){
             let msgArray = [...oldMsgArray,...response.data.newMsgArray]
             storeInLocalStorage(msgArray);
@@ -114,7 +114,7 @@ createGroupForm.addEventListener('submit',async(e)=>{
         // making an object of input
         let grpObj = {name: createGrpNameInput.value}
         // making a post request
-        let response = await axios.post('http://localhost:5000/group/createGroup',grpObj,{ headers:{ 'Authorization': token }});
+        let response = await axios.post('http://16.16.27.246:5000/group/createGroup',grpObj,{ headers:{ 'Authorization': token }});
 
         // if success then showing group on display
         if(response.data.success){
@@ -140,7 +140,7 @@ addMemberBtn.addEventListener('click',async(e)=>{
         let token = localStorage.getItem('token');
         let groupId = localStorage.getItem('groupId');
              // making a post call
-        let response = await axios.post('http://localhost:5000/user/checkIfAdmin',{
+        let response = await axios.post('http://16.16.27.246:5000/user/checkIfAdmin',{
             groupId : groupId
         },{ headers:{ 'Authorization': token }})
 
@@ -168,7 +168,7 @@ async function addUserToGroup(e){
         const groupId = localStorage.getItem('groupId')
 
         // first we have to check if user(who is trying to add member) is admin or not
-        let response = await axios.post('http://localhost:5000/user/checkIfAdmin',{
+        let response = await axios.post('http://16.16.27.246:5000/user/checkIfAdmin',{
             groupId : groupId
         },{ headers:{ 'Authorization': token }})
 
@@ -178,7 +178,7 @@ async function addUserToGroup(e){
             // storing groupId and email in an obj
             let obj = {groupId : groupId , email : email };
             // making a post request
-            let result = await axios.post('http://localhost:5000/group/addUser',obj,{
+            let result = await axios.post('http://16.16.27.246:5000/group/addUser',obj,{
                 headers:{ 'Authorization': token }
             })
 
@@ -211,7 +211,7 @@ async function showMembers(e){
         let token = localStorage.getItem('token');
         let groupId = localStorage.getItem('groupId');
 
-        let response = await axios.get(`http://localhost:5000/group/getAllMembers?groupId=${groupId}`,{headers:{ 'Authorization': token }})
+        let response = await axios.get(`http://16.16.27.246:5000/group/getAllMembers?groupId=${groupId}`,{headers:{ 'Authorization': token }})
 
         // showing members
         // but first clearing list
@@ -245,7 +245,7 @@ async function loadGroups(e){
     try{
         let token = localStorage.getItem('token')
         // getting groups from database
-        let response = await axios.get('http://localhost:5000/group/getGroups',{
+        let response = await axios.get('http://16.16.27.246:5000/group/getGroups',{
             headers:{ 'Authorization': token }
         })
 
@@ -279,7 +279,7 @@ async function modifyMemberList(e){
             let rmvUserId = e.target.parentElement.id;
             // making a post request but 1st making an obj
             let obj = {rmvUserId : rmvUserId, groupId : groupId}
-            let result = await axios.post('http://localhost:5000/group/removeMember',obj,{headers:{ 'Authorization': token }})
+            let result = await axios.post('http://16.16.27.246:5000/group/removeMember',obj,{headers:{ 'Authorization': token }})
 
             if(result.data.success){
                 showMemberBtn.click()
@@ -297,7 +297,7 @@ async function modifyMemberList(e){
             let mkAdminUserId = e.target.parentElement.id;
             // making a post request but 1st making an obj
             let obj = {mkAdminUserId : mkAdminUserId, groupId : groupId}
-            let result = await axios.post('http://localhost:5000/group/makeAdmin',obj,{headers:{ 'Authorization': token }})
+            let result = await axios.post('http://16.16.27.246:5000/group/makeAdmin',obj,{headers:{ 'Authorization': token }})
 
             if(result.data.success){
                 showMemberBtn.click()
@@ -315,7 +315,7 @@ async function modifyMemberList(e){
             let rmAdminUserId = e.target.parentElement.id;
             // making a post request but 1st making an obj
             let obj = {rmAdminUserId : rmAdminUserId, groupId : groupId}
-            let result = await axios.post('http://localhost:5000/group/removeAdmin',obj,{headers:{ 'Authorization': token }})
+            let result = await axios.post('http://16.16.27.246:5000/group/removeAdmin',obj,{headers:{ 'Authorization': token }})
 
             if(result.data.success){
                 showMemberBtn.click()
@@ -381,7 +381,7 @@ async function sendFile (e){
             // appending file to form data
             formData.append('file',file)
             // making a post request to upload
-            let result = await axios.post('http://localhost:5000/chat/upload',formData,{headers:{ 'Authorization': token }})
+            let result = await axios.post('http://16.16.27.246:5000/chat/upload',formData,{headers:{ 'Authorization': token }})
 
             if(result.data.success){
                 let fileurl = result.data.fileurl;
@@ -395,7 +395,7 @@ async function sendFile (e){
                 // making an obj with msg
                 let obj = {msg : `<a href="${fileurl}">${filename}</a>` , groupId : groupId};
                 // posting this msg
-                let response = await axios.post('http://localhost:5000/chat/sendMsg',    obj,{ headers:{ 'Authorization': token }});
+                let response = await axios.post('http://16.16.27.246:5000/chat/sendMsg',    obj,{ headers:{ 'Authorization': token }});
                 if(response.data.sucess){
                     loadMsg();
                 }

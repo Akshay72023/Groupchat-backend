@@ -9,7 +9,7 @@ loginBtn.addEventListener('click',
                 email,
                 password
             }
-            const response= await axios.post('http://localhost:5000/user/login',loginDetails);
+            const response= await axios.post('http://16.16.27.246:5000/user/login',loginDetails);
             console.log(response);
             if(response.status===200){
                 localStorage.setItem('token', response.data.token);

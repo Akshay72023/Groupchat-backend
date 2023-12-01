@@ -7,7 +7,7 @@ submitBtn.addEventListener('click',
                 const obj={
                     email
                 }
-                const response= await axios.post('http://localhost:5000/password/forgotpassword',obj);
+                const response= await axios.post('http://16.16.27.246:5000/password/forgotpassword',obj);
                 if(response.status === 200){
                     document.getElementById('message').textContent= 'Mail sent successfully';
                  } else {
