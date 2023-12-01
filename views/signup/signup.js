@@ -31,5 +31,12 @@ signupBtn.addEventListener('click',
         }    
 });
 
+//--------handling socketIO----------------//
+const socket = io()
+
+socket.on('connect',()=>{
+    console.log("Connected to server with socket id :",socket.id);
+})
+
 
     

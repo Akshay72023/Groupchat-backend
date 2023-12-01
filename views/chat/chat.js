@@ -19,6 +19,8 @@ emailLi.innerText = `Email :: ${localStorage.getItem('email')}`
 
 msgForm.addEventListener('submit', sendMessage);
 
+const socket = io('http://localhost:8000')
+
 async function sendMessage(e) {
     e.preventDefault();
     if (msgInput.value === '') {
@@ -26,7 +28,11 @@ async function sendMessage(e) {
     } else {
         try {
             let token = localStorage.getItem('token');
-            let groupId = localStorage.getItem('groupId')
+            let groupId = localStorage.getItem('groupId');
+            
+            //sending msg through socket
+            socket.emit('sendMsg',{msg : msgInput.value, username : localStorage.getItem('username'),time : new Date(),groupId : groupId});
+
             // making an obj with msg
             let obj = {msg : msgInput.value , groupId : groupId};
             // Posting this msg
@@ -206,7 +212,7 @@ async function showMembers(e){
         let response = await axios.get(`http://localhost:5000/group/getAllMembers?groupId=${groupId}`,{headers:{ 'Authorization': token }})
 
         // showing members
-            // but first clearing list
+        // but first clearing list
         memberList.innerHTML = '';
         response.data.userArray.forEach((member)=>{
             // making an member li
@@ -333,8 +339,16 @@ function selectGroup(e){
         // getting group id
         let groupId = e.target.parentElement.id;
 
+        //leaving current room (socket IO) if any
+        if(localStorage.getItem('groupId')){
+            socket.emit('leaveRoom',localStorage.getItem('groupId'))
+        }
+
         // saving groupId in local storage
         localStorage.setItem('groupId',groupId);
+
+         // joining socket to a room (named after group)for socket IO
+         socket.emit('joinRoom',groupId)
 
         // closing 'addmember' and 'member list' dropdowns
         memberList.style.display = 'none';
@@ -405,5 +419,12 @@ function makeAdminOrIsAdminBtn(member){
         return adminBtn
     }
 }
+
+// showing msg which came by socket
+socket.on('message', (msgObj)=>{
+    let li = makeLi(msgObj.username,msgObj.msg,msgObj.time);
+    chatUl.appendChild(li)
+
+})
 // // Reload messages every 5 seconds
 // setInterval(loadMsg, 5000);
