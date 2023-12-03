@@ -14,7 +14,7 @@ signupBtn.addEventListener('click',
                 password
             }
             console.log(userDetails);
-            const response= await axios.post('http://16.16.27.246:5000/user/signup',userDetails);
+            const response= await axios.post('http://13.49.225.119:5000/user/signup',userDetails);
             console.log(response);
             if (response.status === 201) {
                 alert(response.data.message);
@@ -32,7 +32,7 @@ signupBtn.addEventListener('click',
 });
 
 //--------handling socketIO----------------//
-const socket = io('http://16.16.27.246:8000');
+const socket = io('http://13.49.225.119:8000');
 
 socket.on('connect',()=>{
     console.log("Connected to server with socket id :",socket.id);
